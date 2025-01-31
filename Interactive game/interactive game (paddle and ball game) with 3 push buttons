@@ -1,0 +1,123 @@
+#include "U8glib.h"
+#include <EEPROM.h> // Include the EEPROM library
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0); // I2C / TWI 
+
+int paddleX = 54;
+int ballX = 64;
+int ballY = 32;
+int ballSpeedX = 2;
+int ballSpeedY = 2;
+int buttonLeft = 2;   // Pin for left button
+int buttonRight = 3;  // Pin for right button
+int buttonStart = 4;  // Pin for start/reset button
+bool gameStarted = false;
+int score = 0;
+int highScore = 0;
+
+// EEPROM address to store the high score
+const int highScoreAddress = 0;
+
+void drawPaddle() {
+  u8g.drawBox(paddleX, 60, 20, 4); // Draw the paddle
+}
+
+void drawBall() {
+  u8g.drawDisc(ballX, ballY, 3); // Draw the ball
+}
+
+void resetGame() {
+  paddleX = 54;
+  ballX = 64;
+  ballY = 32;
+  ballSpeedX = 2;
+  ballSpeedY = 2;
+  score = 0; // Reset the score
+  gameStarted = true;
+}
+
+void updateHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    EEPROM.write(highScoreAddress, highScore); // Save the new high score to EEPROM
+  }
+}
+
+void setup(void) {
+  pinMode(buttonLeft, INPUT_PULLUP);  // Enable internal pull-up resistor
+  pinMode(buttonRight, INPUT_PULLUP); // Enable internal pull-up resistor
+  pinMode(buttonStart, INPUT_PULLUP); // Enable internal pull-up resistor
+
+  // Read the high score from EEPROM
+  highScore = EEPROM.read(highScoreAddress);
+}
+
+void loop(void) {
+  // Check if the start/reset button is pressed
+  if (digitalRead(buttonStart) == LOW) {
+    resetGame();
+    delay(200); // Debounce delay
+  }
+
+  // Check if the game is started
+  if (gameStarted) {
+    // Check button presses for paddle movement
+    if (digitalRead(buttonLeft) == LOW) {
+      paddleX -= 3;
+    }
+    if (digitalRead(buttonRight) == LOW) {
+      paddleX += 3;
+    }
+
+    // Update ball position
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    // Bounce off the edges
+    if (ballX + 3 >= 128 || ballX - 3 <= 0) {
+      ballSpeedX = -ballSpeedX;
+    }
+    if (ballY - 3 <= 0) {
+      ballSpeedY = -ballSpeedY;
+    }
+
+    // Check if ball hits the paddle
+    if (ballY + 3 >= 60 && ballX >= paddleX && ballX <= paddleX + 20) {
+      ballSpeedY = -ballSpeedY;
+      score++; // Increase the score when the ball hits the paddle
+    }
+
+    // Check if ball goes out of bounds
+    if (ballY + 3 >= 64) {
+      updateHighScore(); // Update the high score if needed
+      gameStarted = false; // Stop the game
+    }
+  }
+
+  // Picture loop
+  u8g.firstPage();  
+  do {
+    if (gameStarted) {
+      // Draw the paddle and ball
+      drawPaddle();
+      drawBall();
+
+      // Display the current score
+      u8g.setFont(u8g_font_unifont);
+      u8g.setPrintPos(0, 12);
+      u8g.print("Score: ");
+      u8g.print(score);
+    } else {
+      // Display game over screen with high score
+      u8g.setFont(u8g_font_unifont);
+      u8g.drawStr( 1, 15, "Game Over!");
+      u8g.setPrintPos(1, 35);
+      u8g.print("High Score: ");
+      u8g.print(highScore);
+      u8g.drawStr(1, 55, "Press Start");
+    }
+  } while(u8g.nextPage());
+
+  // Delay to control the game speed
+  delay(20);
+}
