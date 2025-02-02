@@ -45,10 +45,20 @@ void updateHighScore() {
   }
 }
 
+void resetHighScore() {
+  EEPROM.write(highScoreAddress, 0);      // Low byte
+  EEPROM.write(highScoreAddress + 1, 0);  // High byte
+  highScore = 0;
+}
+
+
 void setup(void) {
   pinMode(buttonLeft, INPUT_PULLUP);  // Enable internal pull-up resistor
   pinMode(buttonRight, INPUT_PULLUP); // Enable internal pull-up resistor
   pinMode(buttonStart, INPUT_PULLUP); // Enable internal pull-up resistor
+
+  // Uncomment this line once to reset the high score, then comment it again.
+  //resetHighScore();  // Reset high score in EEPROM
 
   // Read the high score from EEPROM (as two bytes)
   int lowByte = EEPROM.read(highScoreAddress);
