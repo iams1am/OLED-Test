@@ -39,7 +39,9 @@ void resetGame() {
 void updateHighScore() {
   if (score > highScore) {
     highScore = score;
-    EEPROM.write(highScoreAddress, highScore); // Save the new high score to EEPROM
+    // Save the high score to EEPROM (as two bytes)
+    EEPROM.write(highScoreAddress, highScore & 0xFF);         // Low byte
+    EEPROM.write(highScoreAddress + 1, (highScore >> 8) & 0xFF); // High byte
   }
 }
 
@@ -48,8 +50,17 @@ void setup(void) {
   pinMode(buttonRight, INPUT_PULLUP); // Enable internal pull-up resistor
   pinMode(buttonStart, INPUT_PULLUP); // Enable internal pull-up resistor
 
-  // Read the high score from EEPROM
-  highScore = EEPROM.read(highScoreAddress);
+  // Read the high score from EEPROM (as two bytes)
+  int lowByte = EEPROM.read(highScoreAddress);
+  int highByte = EEPROM.read(highScoreAddress + 1);
+  highScore = (highByte << 8) | lowByte;
+
+  // If the high score is 65535 (uninitialized EEPROM), set it to 0
+  if (highScore == 65535) {
+    highScore = 0;
+    EEPROM.write(highScoreAddress, 0); // Initialize low byte
+    EEPROM.write(highScoreAddress + 1, 0); // Initialize high byte
+  }
 }
 
 void loop(void) {
@@ -110,7 +121,7 @@ void loop(void) {
     } else {
       // Display game over screen with high score
       u8g.setFont(u8g_font_unifont);
-      u8g.drawStr( 1, 15, "Game Over!");
+      u8g.drawStr(1, 15, "Game Over!");
       u8g.setPrintPos(1, 35);
       u8g.print("High Score: ");
       u8g.print(highScore);
