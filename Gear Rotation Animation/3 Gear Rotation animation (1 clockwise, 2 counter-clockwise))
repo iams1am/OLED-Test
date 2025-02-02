@@ -1,0 +1,150 @@
+#include <U8glib.h>
+
+// Initialize the display
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE | U8G_I2C_OPT_DEV_0); // I2C / TWI
+
+// Variables for rotation
+float angle = 0; // Current rotation angle
+float angleCC = 0;  // Current rotation angle for gear 2
+const float angleStep = 10; // Increment angle by 10 degrees per frame (Clockwise)
+const float angleStepCC = -10; // Decrement angle by 10 degrees per frame (negative for opposite direction) (Counter-Clockwise)
+
+///////////////////////////////////////////////////////////////////////////////////
+// You can open a new tab in the Arduino IDE and write this part to draw Gear 01
+
+// Function to draw the gear
+void drawGear1(float rotationAngle) {
+  const int centerX = 50; // Center of the screen (X-axis)
+  const int centerY = 34; // Center of the screen (Y-axis)
+  const int gearRadius = 10; // Radius of the gear
+  const int toothLength = 5; // Length of the gear teeth
+  const int numTeeth = 8; // Number of teeth
+
+  // Draw the inner circle of the gear
+  u8g.drawCircle(centerX , centerY , gearRadius - 5); // Inner circle
+
+  // Draw the gear teeth
+  for (int i = 0; i < numTeeth; i++) {
+    float toothAngle = rotationAngle + i * (360.0 / numTeeth); // Angle of each tooth
+    float radianAngle = toothAngle * (PI / 180.0); // Convert angle to radians
+
+    // Start of the tooth
+    int x1 = centerX + (gearRadius + toothLength) * cos(radianAngle);
+    int y1 = centerY + (gearRadius + toothLength) * sin(radianAngle);
+
+    // End of the tooth
+    int x2 = centerX + gearRadius * cos(radianAngle);
+    int y2 = centerY + gearRadius * sin(radianAngle);
+
+    // Draw the tooth line
+    u8g.drawLine(x1, y1, x2, y2);
+  }
+
+  // Draw the outer circle of the gear
+  u8g.drawCircle(centerX, centerY, gearRadius); // Outer circle
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// You can open a new tab in the Arduino IDE and write this part to draw Gear 02
+
+
+// Function to draw the gear
+void drawGear2(float rotationAngle) {
+  const int centerX = 73; // Center of the screen (X-axis)
+  const int centerY = 15; // Center of the screen (Y-axis)
+  const int gearRadius = 10; // Radius of the gear
+  const int toothLength = 5; // Length of the gear teeth
+  const int numTeeth = 8; // Number of teeth
+
+  // Draw the inner circle of the gear
+  u8g.drawCircle(centerX , centerY , gearRadius - 5); // Inner circle
+
+  // Draw the gear teeth
+  for (int i = 0; i < numTeeth; i++) {
+    float toothAngle = rotationAngle + i * (360.0 / numTeeth); // Angle of each tooth
+    float radianAngle = toothAngle * (PI / 180.0); // Convert angle to radians
+
+    // Start of the tooth
+    int x1 = centerX + (gearRadius + toothLength) * cos(radianAngle);
+    int y1 = centerY + (gearRadius + toothLength) * sin(radianAngle);
+
+    // End of the tooth
+    int x2 = centerX + gearRadius * cos(radianAngle);
+    int y2 = centerY + gearRadius * sin(radianAngle);
+
+    // Draw the tooth line
+    u8g.drawLine(x1, y1, x2, y2);
+  }
+
+  // Draw the outer circle of the gear
+  u8g.drawCircle(centerX, centerY, gearRadius); // Outer circle
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// You can open a new tab in the Arduino IDE and write this part to draw Gear 03
+
+
+// Function to draw the gear
+void drawGear3(float rotationAngle) {
+  const int centerX = 76; // Center of the screen (X-axis)
+  const int centerY = 44; // Center of the screen (Y-axis)
+  const int gearRadius = 10; // Radius of the gear
+  const int toothLength = 5; // Length of the gear teeth
+  const int numTeeth = 8; // Number of teeth
+
+  // Draw the inner circle of the gear
+  u8g.drawCircle(centerX , centerY , gearRadius - 5); // Inner circle
+
+  // Draw the gear teeth
+  for (int i = 0; i < numTeeth; i++) {
+    float toothAngle = rotationAngle + i * (360.0 / numTeeth); // Angle of each tooth
+    float radianAngle = toothAngle * (PI / 180.0); // Convert angle to radians
+
+    // Start of the tooth
+    int x1 = centerX + (gearRadius + toothLength) * cos(radianAngle);
+    int y1 = centerY + (gearRadius + toothLength) * sin(radianAngle);
+
+    // End of the tooth
+    int x2 = centerX + gearRadius * cos(radianAngle);
+    int y2 = centerY + gearRadius * sin(radianAngle);
+
+    // Draw the tooth line
+    u8g.drawLine(x1, y1, x2, y2);
+  }
+
+  // Draw the outer circle of the gear
+  u8g.drawCircle(centerX, centerY, gearRadius); // Outer circle
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+// Setup function
+void setup() {
+  // Nothing to initialize in setup for this example
+}
+
+
+// Loop function
+void loop() {
+  // Update the display
+  u8g.firstPage();
+  do {
+    drawGear1(angle); // Draw the gear with the current rotation angle
+    drawGear2(angleCC); // Draw the gear with the current rotation angle
+    drawGear3(angle); // Draw the gear with the current rotation angle
+  } while (u8g.nextPage());
+
+  // Increment the rotation angle
+  angle += angleStep; // Gear 1,3 rotates clockwise
+  if (angle >= 360) 
+    angle -= 360; // Keep the angle within the range [0, 360)
+  
+  // Decrement the rotation angle for the opposite rotation
+  angleCC +=angleStepCC; // Gear 2 rotates counter-clockwise
+  if (angleCC < 0) 
+    angleCC += 360; // Keep the angle within the range [0, 360)
+
+
+  // Delay to control the frame rate
+  delay(50); // Adjust for desired speed
+}
