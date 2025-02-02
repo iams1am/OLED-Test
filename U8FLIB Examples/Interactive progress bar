@@ -1,0 +1,59 @@
+#include "U8glib.h"
+
+U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0); // I2C / TWI
+
+int progress = 0;
+const int buttonUp = 2;
+const int buttonDown = 3;
+const int buttonSelect = 4;
+
+void drawProgressBar() {
+  u8g.drawFrame(10, 20, 108, 10); // Draw the progress bar frame
+  u8g.drawBox(12, 22, progress, 6); // Draw the progress
+  // Draw the back button below the progress bar
+  u8g.setFont(u8g_font_6x13);
+  u8g.setPrintPos(54, 62);
+  u8g.print("Back");
+}
+
+void setup(void) {
+  pinMode(buttonUp, INPUT_PULLUP);
+  pinMode(buttonDown, INPUT_PULLUP);
+  pinMode(buttonSelect, INPUT_PULLUP);
+}
+
+void loop(void) {
+  // Picture loop
+  u8g.firstPage();  
+  do {
+    drawProgressBar();
+  } while(u8g.nextPage());
+  
+  // Control progress using buttons
+  if (digitalRead(buttonUp) == LOW) {
+    progress += 2;  // Increase progress
+    if (progress > 104) {  // Limit max progress
+      progress = 104;
+    }
+    delay(200);
+  }
+
+  if (digitalRead(buttonDown) == LOW) {
+    progress -= 2;  // Decrease progress
+    if (progress < 0) {  // Limit min progress
+      progress = 0;
+    }
+    delay(200);
+  }
+
+  // Check if the "Back" button is pressed (D4)
+  if (digitalRead(buttonSelect) == LOW) {
+    // Add the logic for going back (e.g., going to the main menu or previous screen)
+    // Reset progress when going back, or handle accordingly
+    progress = 0;
+    delay(200);
+  }
+  
+  // Delay to control the refresh speed
+  delay(50);
+}
