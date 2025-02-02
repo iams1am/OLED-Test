@@ -104,7 +104,7 @@ void loop(void) {
 
       // Display the current score
       u8g.setFont(u8g_font_unifont);
-      u8g.setPrintPos(0, 12);
+      u8g.setPrintPos(1, 12);
       u8g.print("Score: ");
       u8g.print(score);
     } else {
