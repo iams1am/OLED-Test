@@ -1,6 +1,6 @@
 # Gear Rotation U8glib library
 
-Explanation:
+### Explanation:
 
 Gear Drawing: The drawGear function uses trigonometry to calculate the positions of the gear teeth and draws them using u8g.drawLine. It also draws inner and outer circles to represent the gear's body.
 
@@ -15,7 +15,7 @@ Set to 15 and -15 degrees (previously 5 degrees). This increases the rotation am
 
 Angle Wrapping: The if (angle < 0) condition ensures the angle wraps around to stay within [0, 360) when decrementing. Angles are kept within [0, 360) to avoid overflow or underflow for both gears.
 
-Notes:
+### Notes:
 
 This code assumes an 8-tooth gear for simplicity. You can adjust the number of teeth by changing the numTeeth value.
 
