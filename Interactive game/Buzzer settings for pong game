@@ -1,0 +1,21 @@
+//Example: Adding Sound Effects
+//If you have a buzzer connected to your Arduino, you can add sound effects like this:
+//Add a buzzer pin:
+
+const int buzzerPin = 8; // Connect buzzer to pin 8
+
+//Play a sound when the ball hits the paddle:
+
+if (ballY + 3 >= 60 && ballX >= paddleX && ballX <= paddleX + 20) {
+  ballSpeedY = -ballSpeedY;
+  score++; // Increase the score
+  tone(buzzerPin, 1000, 100); // Play a 1kHz tone for 100ms
+}
+
+//Play a sound when the game ends:
+
+if (lives == 0) {
+  tone(buzzerPin, 500, 500); // Play a 500Hz tone for 500ms
+  delay(500); // Wait for the sound to finish
+  noTone(buzzerPin); // Stop the sound
+}
