@@ -1,0 +1,31 @@
+#include "U8glib.h"
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0); // I2C / TWI 
+
+int progress = 0;
+
+void drawProgressBar() {
+  u8g.drawFrame(10, 20, 108, 10); // Draw the progress bar frame
+  u8g.drawBox(12, 22, progress, 6); // Draw the progress
+}
+
+void setup(void) {
+  // No additional setup required
+}
+
+void loop(void) {
+  // Picture loop
+  u8g.firstPage();  
+  do {
+    drawProgressBar();
+  } while(u8g.nextPage());
+  
+  // Update progress
+  progress += 1;
+  if (progress > 104) {
+    progress = 0;
+  }
+  
+  // Delay to control the progress speed
+  delay(50);
+}
