@@ -1,0 +1,44 @@
+#include "U8glib.h"
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0); // I2C / TWI 
+
+const char *menuItems[] = {"Option 1", "Option 2", "Option 3", "Option 4"};
+int menuIndex = 0;
+int buttonUp = 3;    // Pin for up button
+int buttonDown = 4;  // Pin for down button
+
+void drawMenu() {
+  u8g.setFont(u8g_font_unifont);
+  for (int i = 0; i < 4; i++) {
+    if (i == menuIndex) {
+      u8g.drawStr(0, 12 + i * 12, ">");
+    }
+    u8g.drawStr(10, 12 + i * 12, menuItems[i]);
+  }
+}
+
+void setup(void) {
+  pinMode(buttonUp, INPUT_PULLUP);
+  pinMode(buttonDown, INPUT_PULLUP);
+}
+
+void loop(void) {
+  // Check button presses
+  if (digitalRead(buttonUp) == LOW) {
+    menuIndex = (menuIndex - 1 + 4) % 4;
+    delay(200); // Debounce delay
+  }
+  if (digitalRead(buttonDown) == LOW) {
+    menuIndex = (menuIndex + 1) % 4;
+    delay(200); // Debounce delay
+  }
+  
+  // Picture loop
+  u8g.firstPage();  
+  do {
+    drawMenu();
+  } while(u8g.nextPage());
+  
+  // Delay to control the refresh rate
+  delay(50);
+}
